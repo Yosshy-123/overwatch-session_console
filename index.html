@@ -105,79 +105,80 @@
 
         <main class="flex-1 min-h-0 overflow-hidden p-5 lg:p-6 grid grid-rows-[auto_minmax(0,1fr)] gap-5">
             
-            <section class="grid grid-cols-2 xl:grid-cols-4 gap-4 shrink-0">
-                <div class="glass-panel p-4 rounded-2xl flex flex-col justify-between min-h-[110px]">
-                    <div class="flex justify-between items-start mb-2">
-                        <h2 class="text-[11px] font-medium text-zinc-500 uppercase tracking-wider m-0">Relay Throughput</h2>
-                        <i data-lucide="arrow-down-right" class="w-4 h-4 text-brand-cyan"></i>
-                    </div>
-                    <div class="flex items-end gap-2">
-                        <span class="text-3xl font-light text-zinc-100 font-mono data-value-glow" id="inbound-metric">0.0</span>
-                        <span class="text-sm text-zinc-500 mb-1">Gbps</span>
-                    </div>
-                </div>
+            <section class="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_360px] gap-5 min-h-0">
+  <div class="flex flex-col gap-5 min-h-0">
+    <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-3 gap-4 shrink-0">
+      <div class="glass-panel p-4 rounded-2xl flex flex-col justify-between min-h-[110px]">
+        <div class="flex justify-between items-start mb-2">
+          <h2 class="text-[11px] font-medium text-zinc-500 uppercase tracking-wider m-0">Relay Throughput</h2>
+          <i data-lucide="arrow-down-right" class="w-4 h-4 text-brand-cyan block -mr-2"></i>
+        </div>
+        <div class="flex items-end gap-2">
+          <span class="text-3xl font-light text-zinc-100 font-mono data-value-glow" id="inbound-metric">0.0</span>
+          <span class="text-sm text-zinc-500 mb-1">Gbps</span>
+        </div>
+      </div>
 
-                <div class="glass-panel p-4 rounded-2xl flex flex-col justify-between min-h-[110px]">
-                    <div class="flex justify-between items-start mb-2">
-                        <h2 class="text-[11px] font-medium text-zinc-500 uppercase tracking-wider m-0">Active Nodes</h2>
-                        <i data-lucide="crosshair" class="w-4 h-4 text-brand-red"></i>
-                    </div>
-                    <div class="flex items-end gap-2">
-                        <span class="text-3xl font-light text-zinc-100 font-mono" id="hosts-metric">1,842</span>
-                    </div>
-                </div>
+      <div class="glass-panel p-4 rounded-2xl flex flex-col justify-between min-h-[110px]">
+        <div class="flex justify-between items-start mb-2">
+          <h2 class="text-[11px] font-medium text-zinc-500 uppercase tracking-wider m-0">Active Nodes</h2>
+          <i data-lucide="crosshair" class="w-4 h-4 text-brand-red block -mr-2"></i>
+        </div>
+        <div class="flex items-end gap-2">
+          <span class="text-3xl font-light text-zinc-100 font-mono" id="hosts-metric">1,842</span>
+        </div>
+      </div>
 
-                <div class="glass-panel p-4 rounded-2xl flex flex-col justify-between min-h-[110px]">
-                    <div class="flex justify-between items-start mb-2">
-                        <h2 class="text-[11px] font-medium text-zinc-500 uppercase tracking-wider m-0">Outbound Packets</h2>
-                        <i data-lucide="database-zap" class="w-4 h-4 text-brand-purple"></i>
-                    </div>
-                    <div class="flex items-end gap-2">
-                        <span class="text-3xl font-light text-zinc-100 font-mono" id="exfil-metric">847</span>
-                        <span class="text-sm text-zinc-500 mb-1">GB</span>
-                    </div>
-                </div>
-            </section>
+      <div class="glass-panel p-4 rounded-2xl flex flex-col justify-between min-h-[110px]">
+        <div class="flex justify-between items-start mb-2">
+          <h2 class="text-[11px] font-medium text-zinc-500 uppercase tracking-wider m-0">Outbound Packets</h2>
+          <i data-lucide="database-zap" class="w-4 h-4 text-brand-purple block -mr-2"></i>
+        </div>
+        <div class="flex items-end gap-2">
+          <span class="text-3xl font-light text-zinc-100 font-mono" id="exfil-metric">847</span>
+          <span class="text-sm text-zinc-500 mb-1">GB</span>
+        </div>
+      </div>
+    </div>
 
-            <section class="grid grid-cols-1 xl:grid-cols-[minmax(0,1.65fr)_minmax(340px,1fr)] gap-5 min-h-0">
-                
-                <div class="glass-panel rounded-2xl p-5 flex flex-col min-h-0 overflow-hidden">
-                    <div class="flex justify-between items-center mb-4 shrink-0">
-                        <h2 class="text-sm font-medium text-zinc-300 m-0">Packet Trace</h2>
-                        <div class="flex gap-4">
-                            <span class="flex items-center text-xs text-zinc-500"><div class="w-2 h-2 rounded-full bg-brand-cyan mr-2"></div>AUX</span>
-                            <span class="flex items-center text-xs text-zinc-500"><div class="w-2 h-2 rounded-full bg-brand-purple mr-2"></div>RAW</span>
-                        </div>
-                    </div>
-                    <div class="relative flex-1 min-h-0 w-full">
-                        <canvas id="telemetryChart"></canvas>
-                    </div>
-                </div>
+    <div class="glass-panel rounded-2xl p-5 flex flex-col min-h-0 overflow-hidden flex-1">
+      <div class="flex justify-between items-center mb-4 shrink-0">
+        <h2 class="text-sm font-medium text-zinc-300 m-0">Packet Trace</h2>
+        <div class="flex gap-4">
+          <span class="flex items-center text-xs text-zinc-500"><div class="w-2 h-2 rounded-full bg-brand-cyan mr-2"></div>AUX</span>
+          <span class="flex items-center text-xs text-zinc-500"><div class="w-2 h-2 rounded-full bg-brand-purple mr-2"></div>RAW</span>
+        </div>
+      </div>
+      <div class="relative flex-1 min-h-0 w-full">
+        <canvas id="telemetryChart"></canvas>
+      </div>
+    </div>
+  </div>
 
-                <div class="glass-panel rounded-2xl p-5 flex flex-col min-h-0">
-                    <div class="flex justify-between items-center mb-4 shrink-0">
-                        <div class="flex items-center gap-2.5">
-                            <i data-lucide="terminal" class="w-4 h-4 text-zinc-400"></i>
-                            <h2 class="text-sm font-medium text-zinc-300 m-0">Shell Console</h2>
-                        </div>
-                        <span class="flex items-center gap-1.5 text-[10px] font-mono text-brand-green bg-brand-green/10 px-2 py-1 rounded border border-brand-green/20">
-                            <div class="w-1.5 h-1.5 rounded-full bg-brand-green animate-pulse"></div>
-                            CONNECTED
-                        </span>
-                    </div>
+  <div class="glass-panel rounded-2xl p-5 flex flex-col min-h-0 h-full">
+    <div class="flex justify-between items-center mb-4 shrink-0">
+      <div class="flex items-center gap-2.5">
+        <i data-lucide="terminal" class="w-4 h-4 text-zinc-400"></i>
+        <h2 class="text-sm font-medium text-zinc-300 m-0">Shell Console</h2>
+      </div>
+      <span class="flex items-center gap-1.5 text-[10px] font-mono text-brand-green bg-brand-green/10 px-2 py-1 rounded border border-brand-green/20">
+        <div class="w-1.5 h-1.5 rounded-full bg-brand-green animate-pulse"></div>
+        CONNECTED
+      </span>
+    </div>
 
-                    <div class="flex-1 min-h-0 bg-black/40 rounded-xl border border-white/5 p-4 font-mono text-[12px] leading-relaxed overflow-hidden flex flex-col relative shadow-inner">
-                        <div class="flex-1 min-h-0 relative overflow-hidden">
-                            <div id="terminal-log-container" class="absolute bottom-0 left-0 right-0 flex flex-col justify-end"></div>
-                        </div>
-                        <div class="mt-3 flex items-center gap-2 text-zinc-400 shrink-0 border-t border-white/5 pt-2">
-                            <span class="text-brand-cyan font-medium">root@overwatch</span>
-                            <span class="text-zinc-600">~ $</span>
-                            <span class="cursor-blink w-2 h-3.5 bg-zinc-400 inline-block align-middle"></span>
-                        </div>
-                    </div>
-                </div>
-            </section>
+    <div class="flex-1 min-h-0 bg-black/40 rounded-xl border border-white/5 p-4 font-mono text-[12px] leading-relaxed overflow-hidden flex flex-col relative shadow-inner">
+      <div class="flex-1 min-h-0 relative overflow-hidden">
+        <div id="terminal-log-container" class="absolute bottom-0 left-0 right-0 flex flex-col justify-end"></div>
+      </div>
+      <div class="mt-3 flex items-center gap-2 text-zinc-400 shrink-0 border-t border-white/5 pt-2">
+        <span class="text-brand-cyan font-medium">root@overwatch</span>
+        <span class="text-zinc-600">~ $</span>
+        <span class="cursor-blink w-2 h-3.5 bg-zinc-400 inline-block align-middle"></span>
+      </div>
+    </div>
+  </div>
+</section>
         </main>
     </div>
 
@@ -422,7 +423,7 @@
                     { tag: 'NET',   color: 'text-brand-purple', html: `Rerouting socket to <span class="text-brand-cyan">${target}:${port}</span>` },
                     { tag: 'SYS',   color: 'text-zinc-400',     html: `Allocating <span class="text-brand-cyan">4096 bytes</span> in <span class="text-zinc-500">0x${Utils.generateHex(8)}</span>` },
                     { tag: 'SYS',   color: 'text-brand-green',  html: `Reverse shell session established with <span class="text-zinc-100">${target}</span>` },
-                    { tag: 'DUMP',  color: 'text-zinc-600',     html: `0x${Utils.generateHex(4)}: ${Utils.generateHex(2)} ${Utils.generateHex(2)} ${Utils.generateHex(2)} ${Utils.generateHex(2)} ${Utils.generateHex(2)} ${Utils.generateHex(2)}` }
+                    { tag: 'DUMP',  color: 'text-zinc-600',     html: `0x${Utils.generateHex(4)}: ${Utils.generateHex(2)} ${Utils.generateHex(2)} ${Utils.generateHex(2)} ${Utils.generateHex(2)} ${Utils.generateHex(2)}` },
                 ];
                 
                 return templates[Math.floor(Math.random() * templates.length)];
