@@ -5,10 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>OVERWATCH - Session Console</title>
 
-    <!-- Tailwind CSS (CDN) -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        // Tailwindのカスタムテーマ設定
         tailwind.config = {
             darkMode: 'class',
             theme: {
@@ -39,24 +37,18 @@
         }
     </script>
 
-    <!-- 外部ライブラリ: Chart.js & Lucide Icons -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
     <style>
-        /* ベーススタイリング */
         body { font-family: 'Inter', sans-serif; }
         .font-mono { font-family: 'JetBrains Mono', monospace; }
 
-        /* カスタムスクロールバー */
         ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 2px; }
 
-        /* コンポーネントクラス */
         .glass-panel {
             background: rgba(24, 24, 27, 0.72);
             backdrop-filter: blur(12px);
@@ -67,7 +59,6 @@
 
         .data-value-glow { text-shadow: 0 0 10px rgba(6, 182, 212, 0.3); }
 
-        /* アニメーション */
         @keyframes blink {
             0%, 49% { opacity: 1; }
             50%, 100% { opacity: 0; }
@@ -83,14 +74,11 @@
 
 <body class="bg-surface-base text-zinc-400 h-screen overflow-hidden selection:bg-brand-cyan selection:text-white flex flex-col relative">
     
-    <!-- 装飾的な背景グリッド -->
     <div class="absolute inset-0 z-0 pointer-events-none scanline-bg"></div>
 
     <div class="relative z-10 flex h-full flex-col w-full">
-        <!-- ヘッダー領域 -->
         <header class="h-16 shrink-0 border-b border-surface-border bg-surface-base/85 backdrop-blur-sm px-6 lg:px-8 flex items-center justify-between">
             <div class="flex items-center gap-6 min-w-0">
-                <!-- ロゴ / システム名 -->
                 <div class="flex items-center gap-3 shrink-0">
                     <div class="w-2 h-2 bg-brand-cyan rounded-full animate-pulse shadow-[0_0_8px_#06b6d4]"></div>
                     <h1 class="text-zinc-100 font-semibold tracking-wide text-sm m-0">
@@ -98,18 +86,16 @@
                     </h1>
                 </div>
 
-                <!-- ステータス情報 (PC表示のみ) -->
                 <div class="hidden md:flex items-center gap-5 text-xs font-mono min-w-0">
                     <div class="flex items-center text-zinc-300">
                         <span class="text-zinc-500 mr-2">Target Node:</span>
-                        <span id="target-ip" class="text-zinc-100 font-medium"></span>
+                        <span id="target-ip" class="text-zinc-100 font-medium tracking-wider"></span>
                     </div>
                 </div>
             </div>
 
-            <!-- タイムスタンプ -->
             <div class="flex items-center gap-3 lg:gap-4 text-xs shrink-0">
-                <div class="font-mono text-zinc-400 hidden sm:block flex items-center gap-1" id="system-clock">
+                <div class="font-mono text-zinc-400 hidden sm:flex items-center gap-1" id="system-clock">
                     <span id="system-clock-time">00:00:00</span>
                     <span class="text-zinc-600">UTC</span>
                 </div>
@@ -117,12 +103,9 @@
             </div>
         </header>
 
-        <!-- メインダッシュボード領域 -->
         <main class="flex-1 min-h-0 overflow-hidden p-5 lg:p-6 grid grid-rows-[auto_minmax(0,1fr)] gap-5">
             
-            <!-- 上部メトリクスパネル (KPI) -->
             <section class="grid grid-cols-2 xl:grid-cols-4 gap-4 shrink-0">
-                <!-- メトリクス 1: スループット -->
                 <div class="glass-panel p-4 rounded-2xl flex flex-col justify-between min-h-[110px]">
                     <div class="flex justify-between items-start mb-2">
                         <h2 class="text-[11px] font-medium text-zinc-500 uppercase tracking-wider m-0">Relay Throughput</h2>
@@ -134,7 +117,6 @@
                     </div>
                 </div>
 
-                <!-- メトリクス 2: アクティブノード -->
                 <div class="glass-panel p-4 rounded-2xl flex flex-col justify-between min-h-[110px]">
                     <div class="flex justify-between items-start mb-2">
                         <h2 class="text-[11px] font-medium text-zinc-500 uppercase tracking-wider m-0">Active Nodes</h2>
@@ -145,7 +127,6 @@
                     </div>
                 </div>
 
-                <!-- メトリクス 3: 送信パケット -->
                 <div class="glass-panel p-4 rounded-2xl flex flex-col justify-between min-h-[110px]">
                     <div class="flex justify-between items-start mb-2">
                         <h2 class="text-[11px] font-medium text-zinc-500 uppercase tracking-wider m-0">Outbound Packets</h2>
@@ -157,7 +138,6 @@
                     </div>
                 </div>
 
-                <!-- メトリクス 4: 暗号化ステータス -->
                 <div class="glass-panel p-4 rounded-2xl flex flex-col justify-between min-h-[110px]">
                     <div class="flex justify-between items-start mb-2">
                         <h2 class="text-[11px] font-medium text-zinc-500 uppercase tracking-wider m-0">Cipher Drift</h2>
@@ -175,9 +155,8 @@
                 </div>
             </section>
 
-            <!-- 下部メインパネル (チャート & ターミナル) -->
             <section class="grid grid-cols-1 xl:grid-cols-[minmax(0,1.65fr)_minmax(340px,1fr)] gap-5 min-h-0">
-                <!-- パケットトレース チャート -->
+                
                 <div class="glass-panel rounded-2xl p-5 flex flex-col min-h-0 overflow-hidden">
                     <div class="flex justify-between items-center mb-4 shrink-0">
                         <h2 class="text-sm font-medium text-zinc-300 m-0">Packet Trace</h2>
@@ -191,7 +170,6 @@
                     </div>
                 </div>
 
-                <!-- シェルコンソール -->
                 <div class="glass-panel rounded-2xl p-5 flex flex-col min-h-0">
                     <div class="flex justify-between items-center mb-4 shrink-0">
                         <div class="flex items-center gap-2.5">
@@ -205,11 +183,9 @@
                     </div>
 
                     <div class="flex-1 min-h-0 bg-black/40 rounded-xl border border-white/5 p-4 font-mono text-[12px] leading-relaxed overflow-hidden flex flex-col relative shadow-inner">
-                        <!-- ターミナルログ表示領域 -->
                         <div class="flex-1 min-h-0 relative overflow-hidden">
                             <div id="terminal-log-container" class="absolute bottom-0 left-0 right-0 flex flex-col justify-end"></div>
                         </div>
-                        <!-- コマンドプロンプト入力行 -->
                         <div class="mt-3 flex items-center gap-2 text-zinc-400 shrink-0 border-t border-white/5 pt-2">
                             <span class="text-brand-cyan font-medium">root@overwatch</span>
                             <span class="text-zinc-600">~ $</span>
@@ -222,38 +198,37 @@
     </div>
 
     <script>
-        /**
-         * ユーティリティクラス
-         * 汎用的なヘルパーメソッドを提供
-         */
         class Utils {
-            // ランダムなIPv4アドレスを生成
+            static targetIP = '';
+
             static generateRandomIP() {
                 const first = Math.floor(Math.random() * 223) + 1;
                 const rest = Array.from({ length: 3 }, () => Math.floor(Math.random() * 256));
                 return [first, ...rest].join('.');
             }
 
-            // 指定範囲内のランダムな数値を生成
             static randomInRange(min, max) {
                 return Math.random() * (max - min) + min;
             }
 
-            // 値を指定範囲内に制限
             static clamp(value, min, max) {
                 return Math.min(max, Math.max(min, value));
             }
 
-            // 現在のUTC時刻文字列を取得
             static getUTCTimeString() {
                 return new Date().toISOString().substring(11, 19);
             }
+
+            static generateHex(length) {
+                let result = '';
+                const chars = '0123456789abcdef';
+                for (let i = 0; i < length; i++) {
+                    result += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+                return result;
+            }
         }
 
-        /**
-         * システムヘッダー管理クラス
-         * IPアドレスの初期化や時計の更新を担当
-         */
         class SystemHeader {
             constructor() {
                 this.ipElement = document.getElementById('target-ip');
@@ -262,7 +237,9 @@
             }
 
             init() {
-                this.ipElement.textContent = Utils.generateRandomIP();
+                Utils.targetIP = Utils.generateRandomIP();
+                this.ipElement.textContent = Utils.targetIP;
+                
                 this.updateClock();
                 setInterval(() => this.updateClock(), 1000);
             }
@@ -272,10 +249,6 @@
             }
         }
 
-        /**
-         * KPIメトリクス管理クラス
-         * ダッシュボード上部の数値をランダムに変動させる
-         */
         class SystemMetrics {
             constructor() {
                 this.elements = {
@@ -286,9 +259,7 @@
                     cipherText: document.getElementById('cipher-progress-text')
                 };
                 
-                // 初期値設定
                 this.elements.inbound.textContent = '42.8';
-                
                 this.startSimulation();
             }
 
@@ -297,26 +268,22 @@
             }
 
             updateMetrics() {
-                // スループットの更新 (45%の確率)
                 if (Math.random() > 0.45) {
                     const newValue = Utils.randomInRange(38, 48);
                     this.elements.inbound.textContent = newValue.toFixed(1);
                 }
 
-                // ホスト数の更新 (30%の確率で微増)
                 if (Math.random() > 0.7) {
                     const current = parseInt(this.elements.hosts.textContent.replace(/,/g, ''), 10);
                     const increment = Math.floor(Math.random() * 4);
                     this.elements.hosts.textContent = (current + increment).toLocaleString();
                 }
 
-                // 送信パケット数の更新 (20%の確率で増加)
                 if (Math.random() > 0.8) {
                     const current = parseInt(this.elements.exfil.textContent, 10);
                     this.elements.exfil.textContent = (current + 1).toString();
                 }
 
-                // 暗号化進捗の微小な変動 (10%の確率)
                 if (Math.random() > 0.9) {
                     const currentPct = parseInt(this.elements.cipherText.textContent, 10);
                     let nextPct = currentPct + (Math.random() > 0.5 ? 1 : -1);
@@ -328,10 +295,6 @@
             }
         }
 
-        /**
-         * テレメトリーチャート管理クラス
-         * Chart.jsを用いたリアルタイムグラフの描画・更新を担当
-         */
         class TelemetryChart {
             constructor(canvasId) {
                 this.ctx = document.getElementById(canvasId).getContext('2d');
@@ -378,7 +341,7 @@
                                 backgroundColor: gradientAUX,
                                 borderWidth: 1.25,
                                 fill: true,
-                                tension: 0.2, // 滑らかな曲線に調整
+                                tension: 0.2,
                                 pointRadius: 0,
                                 pointHitRadius: 10,
                             },
@@ -398,95 +361,53 @@
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
-                        animation: { duration: 0 }, // リアルタイム性を重視しアニメーション無効
-                        interaction: {
-                            mode: 'index',
-                            intersect: false,
-                        },
+                        animation: { duration: 0 },
+                        interaction: { mode: 'index', intersect: false },
                         scales: {
                             x: { display: false },
                             y: {
                                 display: true,
                                 position: 'right',
-                                grid: {
-                                    color: 'rgba(63, 63, 70, 0.25)',
-                                    drawBorder: false,
-                                },
+                                grid: { color: 'rgba(63, 63, 70, 0.25)', drawBorder: false },
                                 border: { display: false },
-                                ticks: { 
-                                    font: { family: "'JetBrains Mono', monospace", size: 10 },
-                                    stepSize: 20
-                                }
+                                ticks: { font: { family: "'JetBrains Mono', monospace", size: 10 }, stepSize: 20 }
                             }
                         },
-                        plugins: {
-                            legend: { display: false }
-                        }
+                        plugins: { legend: { display: false } }
                     }
                 });
             }
 
             startSimulation() {
                 setInterval(() => {
-                    // TCPデータの変動ロジック (時折スパイクを発生させる)
                     const tcpSpike = Math.random() > 0.92 ? 22 : 0;
-                    const nextTcp = Utils.clamp(
-                        this.tcpData[this.tcpData.length - 1] + Utils.randomInRange(-9, 9) + tcpSpike,
-                        8, 95
-                    );
-                    
-                    // UDPデータの変動ロジック
-                    const nextUdp = Utils.clamp(
-                        this.udpData[this.udpData.length - 1] + Utils.randomInRange(-6, 6),
-                        5, 60
-                    );
+                    const nextTcp = Utils.clamp(this.tcpData[this.tcpData.length - 1] + Utils.randomInRange(-9, 9) + tcpSpike, 8, 95);
+                    const nextUdp = Utils.clamp(this.udpData[this.udpData.length - 1] + Utils.randomInRange(-6, 6), 5, 60);
 
-                    // データのシフトと追加
-                    this.tcpData.shift();
-                    this.tcpData.push(nextTcp);
-                    this.udpData.shift();
-                    this.udpData.push(nextUdp);
-
-                    this.chart.update('none'); // 高速更新
+                    this.tcpData.shift(); this.tcpData.push(nextTcp);
+                    this.udpData.shift(); this.udpData.push(nextUdp);
+                    this.chart.update('none');
                 }, 1000);
             }
         }
 
-        /**
-         * ターミナルエミュレーター管理クラス
-         * ログのストリーミング出力を効率的に描画する
-         */
         class TerminalConsole {
             constructor(containerId) {
                 this.container = document.getElementById(containerId);
-                this.maxLines = 45; // 表示を維持する最大行数
-                this.lines = [];    // DOM要素の配列(リングバッファ的に活用)
-                
-                this.logTemplates = [
-                    { tag: 'SYS', color: 'text-brand-cyan',   cmd: 'systemctl status relay', out: 'active (running)' },
-                    { tag: 'NET', color: 'text-brand-purple', cmd: 'netstat -tuln',          out: 'tcp 0.0.0.0:443 LISTEN' },
-                    { tag: 'SEC', color: 'text-brand-red',    cmd: 'tail -f /var/log/auth',  out: 'connection refused' },
-                    { tag: 'OP',  color: 'text-brand-amber',  cmd: 'decrypt_payload',        out: 'key exchanged' },
-                    { tag: 'IO',  color: 'text-brand-green',  cmd: 'sync_buffer',            out: 'blocks written: 2048' },
-                    { tag: 'SYS', color: 'text-zinc-300',     cmd: 'ping node-alpha',        out: 'time=14.2 ms' },
-                    { tag: 'MEM', color: 'text-brand-cyan',   cmd: 'free -m',                out: 'swap heavily used' },
-                    { tag: 'NET', color: 'text-brand-purple', cmd: 'route -n',               out: 'gateway 192.168.1.1' }
-                ];
-
+                this.maxLines = 45; 
+                this.lines = [];    
                 this.init();
             }
 
             init() {
-                // DOM要素の再利用(オブジェクトプール)のため、初期行を事前生成
                 const fragment = document.createDocumentFragment();
                 for (let i = 0; i < this.maxLines; i++) {
                     const row = this.createRowElement();
-                    this.updateRowContent(row); // 初期データをセット
+                    this.updateRowContent(row, true); 
                     this.lines.push(row);
                     fragment.appendChild(row);
                 }
                 this.container.appendChild(fragment);
-
                 this.startStreaming();
             }
 
@@ -494,12 +415,11 @@
                 const row = document.createElement('div');
                 row.className = 'flex gap-3 items-start min-w-0 font-mono text-[11px] leading-tight mb-1.5 opacity-90';
                 
-                // 内部の構造を作成(再描画のコストを下げるため、innerHTMLではなく要素として保持)
                 const timeSpan = document.createElement('span');
                 timeSpan.className = 'text-zinc-600 shrink-0 whitespace-nowrap time-col';
                 
                 const tagSpan = document.createElement('span');
-                tagSpan.className = 'shrink-0 w-10 tag-col';
+                tagSpan.className = 'shrink-0 w-12 tag-col font-medium';
                 
                 const msgSpan = document.createElement('span');
                 msgSpan.className = 'min-w-0 break-words text-zinc-300 msg-col';
@@ -511,55 +431,76 @@
                 return row;
             }
 
-            updateRowContent(rowElement) {
-                const sample = this.logTemplates[Math.floor(Math.random() * this.logTemplates.length)];
+            generateDynamicLog() {
+                const target = Utils.targetIP || '127.0.0.1';
+                const randomIp = Utils.generateRandomIP();
+                const port = [22, 21, 80, 443, 3389, 8080, 5432, 27017][Math.floor(Math.random() * 8)];
+                const hex = Utils.generateHex(8);
+                const pid = Math.floor(Utils.randomInRange(1000, 9999));
+                
+                const templates = [
+                    { tag: 'SCAN',  color: 'text-brand-cyan',   html: `Initiating Nmap stealth scan against <span class="text-zinc-100">${target}</span>...` },
+                    { tag: 'SCAN',  color: 'text-brand-cyan',   html: `Discovered open port <span class="text-brand-cyan">${port}/tcp</span> on ${target}` },
+                    { tag: 'SEC',   color: 'text-brand-amber',  html: `Bypassing IPS signatures for node <span class="text-zinc-100">${target}</span>...` },
+                    { tag: 'SEC',   color: 'text-brand-red',    html: `Intrusion detection alert ignored on <span class="text-zinc-100">${randomIp}</span>` },
+                    { tag: 'EXP',   color: 'text-brand-red',    html: `Injecting payload into process PID <span class="text-zinc-100">${pid}</span>` },
+                    { tag: 'EXP',   color: 'text-brand-red',    html: `Exploit triggered at memory offset <span class="text-zinc-400">0x${hex}</span>` },
+                    { tag: 'CRYPT', color: 'text-brand-amber',  html: `Brute-forcing AES-256... <span class="text-zinc-500">Hash: ${Utils.generateHex(16)}</span>` },
+                    { tag: 'CRYPT', color: 'text-brand-amber',  html: `Decrypted packet fragment: <span class="text-zinc-400">0x${Utils.generateHex(12)}</span>` },
+                    { tag: 'NET',   color: 'text-brand-purple', html: `Intercepting traffic routing from <span class="text-zinc-100">${randomIp}</span>` },
+                    { tag: 'NET',   color: 'text-brand-purple', html: `Rerouting socket to <span class="text-brand-cyan">${target}:${port}</span>` },
+                    { tag: 'SYS',   color: 'text-zinc-400',     html: `Allocating <span class="text-brand-cyan">4096 bytes</span> in <span class="text-zinc-500">0x${Utils.generateHex(8)}</span>` },
+                    { tag: 'SYS',   color: 'text-brand-green',  html: `Reverse shell session established with <span class="text-zinc-100">${target}</span>` },
+                    { tag: 'DUMP',  color: 'text-zinc-600',     html: `0x${Utils.generateHex(4)}: ${Utils.generateHex(2)} ${Utils.generateHex(2)} ${Utils.generateHex(2)} ${Utils.generateHex(2)} ${Utils.generateHex(2)} ${Utils.generateHex(2)}` }
+                ];
+                
+                return templates[Math.floor(Math.random() * templates.length)];
+            }
+
+            updateRowContent(rowElement, isInit = false) {
+                const logData = this.generateDynamicLog();
                 const timeStr = new Date().toISOString().substring(11, 19);
 
-                // 子要素を取得してテキスト・クラスを更新 (DOMツリーの再構築を防ぐ)
                 const [timeSpan, tagSpan, msgSpan] = rowElement.children;
 
-                timeSpan.textContent = timeStr;
+                if(isInit) {
+                     const pastTime = new Date(Date.now() - Math.random() * 600000);
+                     timeSpan.textContent = pastTime.toISOString().substring(11, 19);
+                } else {
+                     timeSpan.textContent = timeStr;
+                }
                 
-                tagSpan.className = `shrink-0 w-10 ${sample.color}`;
-                tagSpan.textContent = `[${sample.tag}]`;
+                tagSpan.className = `shrink-0 w-12 font-medium ${logData.color}`;
+                tagSpan.textContent = `[${logData.tag}]`;
                 
-                msgSpan.innerHTML = `${sample.cmd} <span class="text-zinc-600 mx-1">:</span> <span class="text-zinc-400">${sample.out}</span>`;
+                msgSpan.innerHTML = logData.html;
             }
 
             appendLog() {
-                // 配列の先頭(一番古い行)を取り出し、内容を更新してコンテナの最後尾に移動
                 const oldestRow = this.lines.shift();
                 this.updateRowContent(oldestRow);
                 
                 this.lines.push(oldestRow);
-                this.container.appendChild(oldestRow); // 既存ノードの appendChild は移動として扱われる
+                this.container.appendChild(oldestRow);
             }
 
             startStreaming() {
-                // ややランダムな間隔でログを出力し、よりリアルな動作を演出
                 const logLoop = () => {
                     this.appendLog();
-                    const nextDelay = Utils.randomInRange(800, 1500);
+                    const nextDelay = Utils.randomInRange(200, 1400);
                     setTimeout(logLoop, nextDelay);
                 };
                 logLoop();
             }
         }
 
-        /**
-         * アプリケーションのメインエントリーポイント
-         * 全てのコンポーネントを初期化する
-         */
         class DashboardApp {
             static bootstrap() {
-                // Lucideアイコンの描画
                 lucide.createIcons();
 
-                // 各コンポーネントの初期化
                 new SystemHeader();
                 new SystemMetrics();
                 
-                // Canvas要素がDOMにマウントされていることを確認してからChartを初期化
                 setTimeout(() => {
                     new TelemetryChart('telemetryChart');
                 }, 0);
@@ -568,9 +509,7 @@
             }
         }
 
-        // DOMの読み込み完了時にアプリケーションを起動
         document.addEventListener('DOMContentLoaded', DashboardApp.bootstrap);
-
     </script>
 </body>
 </html>
